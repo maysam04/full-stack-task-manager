@@ -3,14 +3,17 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .database import Base, engine
 from . import models
-from .routers import tasks
+from .routers import auth, tasks
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Full-Stack Task Manager API",
-    description="A simple Task Manager REST API built with FastAPI and SQLite.",
-    version="1.0.0",
+    description=(
+        "A simple Task Manager REST API built with "
+        "FastAPI, SQLAlchemy, SQLite, and JWT authentication."
+    ),
+    version="2.0.0",
 )
 
 app.add_middleware(
@@ -21,6 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
 app.include_router(tasks.router)
 
 

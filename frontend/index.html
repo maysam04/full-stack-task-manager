@@ -11,25 +11,57 @@
     <main class="container">
         <h1>Task Manager</h1>
 
-        <form id="task-form">
+        <section id="auth-section">
+            <h2>Authentication</h2>
+
             <input
                 type="text"
-                id="title"
-                placeholder="Task title"
+                id="username"
+                placeholder="Username"
                 required
             >
 
-            <textarea
-                id="description"
-                placeholder="Task description"
-            ></textarea>
+            <input
+                type="password"
+                id="password"
+                placeholder="Password"
+                required
+            >
 
-            <button type="submit">Add Task</button>
-        </form>
+            <div class="auth-actions">
+                <button id="register-button">Register</button>
+                <button id="login-button">Login</button>
+            </div>
 
-        <section>
-            <h2>Tasks</h2>
-            <div id="task-list"></div>
+            <p id="auth-message"></p>
+        </section>
+
+        <section id="app-section" hidden>
+            <div class="user-bar">
+                <span id="welcome-message"></span>
+                <button id="logout-button">Logout</button>
+            </div>
+
+            <form id="task-form">
+                <input
+                    type="text"
+                    id="title"
+                    placeholder="Task title"
+                    required
+                >
+
+                <textarea
+                    id="description"
+                    placeholder="Task description"
+                ></textarea>
+
+                <button type="submit">Add Task</button>
+            </form>
+
+            <section>
+                <h2>My Tasks</h2>
+                <div id="task-list"></div>
+            </section>
         </section>
     </main>
 

@@ -7,6 +7,10 @@ __pycache__/
 
 # SQLite database
 backend/tasks.db
+test_tasks.db
+
+# Test coverage
+.coverage
 
 # Environment variables
 .env

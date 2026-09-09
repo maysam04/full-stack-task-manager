@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from ..auth import get_current_user
 from ..database import get_db
-from ..models import Task
+from ..models import Task, User
 from ..schemas import TaskCreate, TaskResponse, TaskUpdate
 
 
@@ -17,11 +18,16 @@ router = APIRouter(
     response_model=TaskResponse,
     status_code=status.HTTP_201_CREATED
 )
-def create_task(task: TaskCreate, db: Session = Depends(get_db)):
+def create_task(
+    task: TaskCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     new_task = Task(
         title=task.title,
         description=task.description,
-        completed=task.completed
+        completed=task.completed,
+        user_id=current_user.id
     )
 
     db.add(new_task)
@@ -32,13 +38,31 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
 
 
 @router.get("", response_model=list[TaskResponse])
-def get_tasks(db: Session = Depends(get_db)):
-    return db.query(Task).all()
+def get_tasks(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return (
+        db.query(Task)
+        .filter(Task.user_id == current_user.id)
+        .all()
+    )
 
 
 @router.get("/{task_id}", response_model=TaskResponse)
-def get_task(task_id: int, db: Session = Depends(get_db)):
-    task = db.query(Task).filter(Task.id == task_id).first()
+def get_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    task = (
+        db.query(Task)
+        .filter(
+            Task.id == task_id,
+            Task.user_id == current_user.id
+        )
+        .first()
+    )
 
     if task is None:
         raise HTTPException(
@@ -53,9 +77,17 @@ def get_task(task_id: int, db: Session = Depends(get_db)):
 def update_task(
     task_id: int,
     task_data: TaskUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    task = db.query(Task).filter(Task.id == task_id).first()
+    task = (
+        db.query(Task)
+        .filter(
+            Task.id == task_id,
+            Task.user_id == current_user.id
+        )
+        .first()
+    )
 
     if task is None:
         raise HTTPException(
@@ -78,8 +110,19 @@ def update_task(
     "/{task_id}",
     status_code=status.HTTP_204_NO_CONTENT
 )
-def delete_task(task_id: int, db: Session = Depends(get_db)):
-    task = db.query(Task).filter(Task.id == task_id).first()
+def delete_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    task = (
+        db.query(Task)
+        .filter(
+            Task.id == task_id,
+            Task.user_id == current_user.id
+        )
+        .first()
+    )
 
     if task is None:
         raise HTTPException(
